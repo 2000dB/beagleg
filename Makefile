@@ -12,7 +12,7 @@
 
 # Change here for which hardware you are compiling. See hardware/ directory.
 # Currently supported BUMPS, CRAMPS, and VGEN5
-export BEAGLEG_HARDWARE_TARGET?=BUMPS
+export BEAGLEG_HARDWARE_TARGET?=CRAMPS
 
 # In case you cross compile this on a different architecture, uncomment this
 # and set the prefix of the compiler binary.

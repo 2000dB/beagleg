@@ -23,7 +23,8 @@
 		  "P9.23", "P9.14", "P8.26", "P8.17", "P9.25",						// power control
 		  "P8.13", "P8.15", "P8.19", "P9.16", "P9.17", "P9.24", "P9.42A", "P9.31", "P9.29",	// step
 		  "P8.12", "P8.14", "P8.18", "P9.12", "P9.18", "P9.26", "P9.16", "P9.28", "P9.30",	// direction
-		  "P8.8", "P8.7", "P9.10", "P8.9", "P9.13", "P9.11",					// endstops
+		  "P8.8", "P9.10", "P8.9", "P9.13", "P9.11",				        	// endstops
+                  "P8.7",                                                                               // pwm outputs
 		  "P8.11", "P9.15", "P9.27", "P9.21", "P9.41A", "P9.22",				// fets
 		  "tscadc";   // Analog digital converter
 
@@ -61,11 +62,12 @@
 				/* P9.30  GPIO3[16]          dir_w	MOTOR_9_DIR (external driver) */
 
 		    0x094 0x2f	/* P8.8   GPIO2[3]  in       x-min	END_X_MIN */
-		    0x090 0x2f	/* P8.7   GPIO2[2]  in       x-max	END_X_MAX */
 		    0x098 0x2f	/* P8.10  GPIO2[4]  in       y-min	END_Y_MIN */
 		    0x09c 0x2f	/* P8.9   GPIO2[5]  in       y-max	END_Y_MAX */
 		    0x074 0x2f	/* P9.13  GPIO0[31] in       z-min	END_Z_MIN */
 		    0x070 0x2f	/* P9.11  GPIO0[30] in       z-max	END_Z_MAX */
+
+		    0x090 0x32	/* P8.7   TIMER4    in       pwm1	PWM_1      */
 
 		    0x034 0x07	/* P8.11  GPIO1[13] out, pd  fet1 */
 		    0x040 0x07	/* P9.15  GPIO1[16] out, pd  fet2 */

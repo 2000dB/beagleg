@@ -7,7 +7,7 @@
 
 # Change here for which hardware you are compiling. See hardware/ directory.
 # Currently supported BUMPS, CRAMPS, and VGEN5
-BEAGLEG_HARDWARE_TARGET?=BUMPS
+BEAGLEG_HARDWARE_TARGET?=CRAMPS
 
 # In case you cross compile this on a different architecture, uncomment this
 # and set the prefix. Or simply set the environment variable.
@@ -90,6 +90,10 @@ gcode2ps: gcode2ps.o $(GCODE_OBJECTS) $(COMMON_LIBS)
 	$(CROSS_COMPILE)$(CXX) -o $@ $^ $(LDFLAGS)
 
 test-html: test-out/test.html
+
+test-pwm: pwm-timer-util.o $(OBJECTS) $(COMMON_LIBS)
+	$(CROSS_COMPILE)$(CXX) -o $@ $^ $(COMMON_LIBS) $(PRUSS_LIBS) $(LDFLAGS)
+
 
 test-out/test.html: gcode2ps test-create-html.sh testdata/*.gcode
 	./test-create-html.sh testdata/*.gcode

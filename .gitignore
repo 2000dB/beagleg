@@ -6,3 +6,4 @@ machine-control
 gcode-print-stats
 gcode2ps
 test-out/
+test-pwm

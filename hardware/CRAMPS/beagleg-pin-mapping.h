@@ -50,7 +50,7 @@
 #define AUX_15_GPIO        PIN_P9_23  // MACHINE_PWR
 #define AUX_16_GPIO        PIN_P9_25  // LED
 
-#define PWM_1_GPIO         PIN_P8_11  // FET1
+#define PWM_1_GPIO         PIN_P8_7   // FET1
 #define PWM_2_GPIO         PIN_P9_15  // FET2
 #define PWM_3_GPIO         PIN_P9_27  // FET3
 #define PWM_4_GPIO         PIN_P9_21  // FET4
@@ -58,7 +58,7 @@
 #define IN_1_GPIO          PIN_P8_8   // X-MIN
 #define IN_2_GPIO          PIN_P8_10  // Y-MIN
 #define IN_3_GPIO          PIN_P9_13  // Z-MIN
-#define IN_4_GPIO          PIN_P8_7   // X-MAX
+//#define IN_4_GPIO          PIN_P8_7   // X-MAX
 #define IN_5_GPIO          PIN_P8_9   // Y-MAX
 #define IN_6_GPIO          PIN_P9_11  // Z-MAX
 #define IN_7_GPIO          PIN_P8_17  // ESTOP

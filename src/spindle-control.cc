@@ -41,6 +41,9 @@ static const char kPort[] = "/dev/ttyACM0";
 // Default max rpm
 static const int kMaxRPM = 3000;
 
+// Default PWM Freq in Hz
+static const float kFreq = 1600;
+
 // Default simple-pwm spindle ramping constants; 10% ramp change every 10ms
 static const float kRampEpsilon = 0.1;
 static const int kRampDelayMs = 10;
@@ -70,6 +73,9 @@ Spindle::Spindle() {
   on_delay_ms_ = 0;
   off_delay_ms_ = 0;
   allow_ccw_ = false;
+  freq_ = kFreq;
+  on_duty_cycle_ = 0;
+  off_duty_cycle_ = 0;
 }
 
 class Spindle::ConfigReader : public ConfigParser::Reader {
@@ -85,6 +91,7 @@ public:
                              const std::string &name,
                              const std::string &value) {
 #define ACCEPT_VALUE(n, T, result) if (name != n) {} else return Parse##T(value, result)
+#define ACCEPT_EXPR(n, result) if (name != n) {} else return ParseFloatExpr(value, result)
     if (current_section_ == "spindle") {
       ACCEPT_VALUE("type",           String, &config_->type_);
       ACCEPT_VALUE("port",           String, &config_->port_);
@@ -93,8 +100,10 @@ public:
       ACCEPT_VALUE("on-delay-msec",  Int,    &config_->on_delay_ms_);
       ACCEPT_VALUE("off-delay-msec", Int,    &config_->off_delay_ms_);
       ACCEPT_VALUE("allow-ccw",      Bool,   &config_->allow_ccw_);
+      ACCEPT_EXPR("freq",            &config_->freq_);
+      ACCEPT_EXPR("off-duty-cycle",  &config_->off_duty_cycle_);
+      ACCEPT_EXPR("on-duty-cycle",   &config_->on_duty_cycle_);
 
-      return false;
     }
     ReportError(line_no, StringPrintf("Unexpected configuration option '%s'",
                                       name.c_str()));
@@ -153,6 +162,50 @@ protected:
   bool is_off_;
   bool is_ccw_;
   float duty_cycle_;
+
+  float freq_;
+  float off_duty_cycle_;
+  float on_duty_cycle_;
+};
+
+class ServoSpindle : public Spindle::Impl {
+public:
+  ServoSpindle(HardwareMapping *hardware_mapping, int max_rpm,
+               int pwr_delay_ms, int on_delay_ms, int off_delay_ms, float freq, float off_duty_cycle, float on_duty_cycle)
+    : Impl(hardware_mapping, max_rpm, pwr_delay_ms, on_delay_ms, off_delay_ms) {
+    Log_debug("Servo Spindle: constructed");
+    Log_debug("  max_rpm        : %d", max_rpm);
+    Log_debug("  pwr_delay_ms   : %d", pwr_delay_ms);
+    Log_debug("  on_delay_ms    : %d", on_delay_ms);
+    Log_debug("  off_delay_ms   : %d", off_delay_ms);
+    Log_debug("  pwm_freq       : %f", freq);
+    Log_debug("  on_duty_cycle  : %f", off_duty_cycle);
+    Log_debug("  off_duty_cycle : %f", on_duty_cycle);
+    on_duty_cycle_ = on_duty_cycle;
+    off_duty_cycle_ = off_duty_cycle;
+    freq_ = freq;
+  }
+
+  void On(bool ccw, int rpm) {
+    // turn on spindle power if necessary
+    if (is_off_) {
+      if (pwr_delay_ms_) sleep_ms(pwr_delay_ms_);
+    }
+    duty_cycle_ = on_duty_cycle_;
+    hardware_mapping_->SetPWMFrequency(HardwareMapping::OUT_SPINDLE_SPEED, freq_);
+    hardware_mapping_->SetPWMOutput(HardwareMapping::OUT_SPINDLE_SPEED, duty_cycle_);
+    is_off_ = false;
+    Log_debug("Servo Spindle: on: freq: %.2fHz, duty cycle: %.2f", freq_, duty_cycle_);
+  }
+  
+  void Off() {
+    if (off_delay_ms_) sleep_ms(off_delay_ms_);
+    duty_cycle_ = off_duty_cycle_;
+    hardware_mapping_->SetPWMFrequency(HardwareMapping::OUT_SPINDLE_SPEED, freq_);
+    hardware_mapping_->SetPWMOutput(HardwareMapping::OUT_SPINDLE_SPEED, duty_cycle_);
+    is_off_ = true;
+    Log_debug("Servo Spindle: off: freq: %.2fHz, duty cycle: %.2f", freq_, duty_cycle_);
+  }
 };
 
 class PWMSpindle : public Spindle::Impl {
@@ -425,6 +478,9 @@ bool Spindle::Init(HardwareMapping *hardware_mapping) {
   } else if (type_ == "pololu-smc") {
     impl_ = new PololuSMCSpindle(hardware_mapping, port_.c_str(), max_rpm_,
                                  pwr_delay_ms_, on_delay_ms_, off_delay_ms_);
+  } else if (type_ == "servo-pwm") {
+    impl_ = new ServoSpindle(hardware_mapping, max_rpm_,
+                             pwr_delay_ms_, on_delay_ms_, off_delay_ms_, freq_, off_duty_cycle_, on_duty_cycle_);
   } else {
     return false;
   }

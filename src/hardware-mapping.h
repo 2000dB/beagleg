@@ -183,6 +183,9 @@ public:
   // Set PWM value for given output immediately.
   void SetPWMOutput(LogicOutput type, float value);
 
+  // Set PWM base frequency
+  void SetPWMFrequency(LogicOutput type, float value);
+
   // -- Motor outputs
 
   // Given the logic axis and number of steps, assign these steps to the mapped

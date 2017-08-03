@@ -216,6 +216,13 @@ void HardwareMapping::SetPWMOutput(LogicOutput type, float value) {
   }
 }
 
+void HardwareMapping::SetPWMFrequency(LogicOutput type, float value) {
+  if (!is_hardware_initialized_) return;
+  const uint32_t gpio = output_to_pwm_gpio_[type];
+  
+  pwm_timer_set_freq(gpio, value);
+}
+
 std::string HardwareMapping::DebugMotorString(LogicAxis axis) {
   const MotorBitmap motormap_for_axis = axis_to_driver_[axis];
   std::string result;

@@ -54,6 +54,10 @@ private:
   int on_delay_ms_;
   int off_delay_ms_;
   bool allow_ccw_;
+  float freq_;
+  float off_duty_cycle_;
+  float on_duty_cycle_;
+  
 };
 
 #endif  // BEAGLEG_SPINDLE_CONTROL_

@@ -84,6 +84,14 @@ public:
       RememberMinMax(axes);
     } else {
       ++segment_count_;
+      if(spindle_change_) {
+        // Change path color when the spindle goes up or down
+        fprintf(file_, "stroke\n"
+                "0.1 setlinewidth %i 0 0 setrgbcolor\n"
+                "%f %f moveto\n",
+                spindle_change_ > 1 ? 0 : 1, axes[AXIS_X], axes[AXIS_Y]);
+        spindle_change_ = 0;
+      }
       fprintf(file_, "%f %f lineto\n", axes[AXIS_X], axes[AXIS_Y]);
       if (segment_count_ % 256 == 0) {
         // Flush graphic context.
@@ -138,6 +146,14 @@ public:
   }
 
   virtual const char *unprocessed(char letter, float value, const char *remain) {
+    if (letter == 'M')
+      if( value == 3) { // Spindle down (i.e. draw)
+        spindle_change_ = 1;
+      } else if( value == 5 ) // Spindle up
+      {
+        spindle_change_ = 2;
+      }
+    
     return NULL;
   }
 
@@ -247,6 +263,8 @@ private:
   unsigned int segment_count_;
   int pass_;
   bool prefer_inch_display_;
+
+  int spindle_change_; // 0 = no change, 1 = up, 
 };
 
 // Taking the low-level motor operations and visualize them. Uses color

@@ -731,6 +731,7 @@ void GCodeMachineControl::Impl::home_axis(enum GCodeParserAxis axis) {
                           : 0.0f);
   const float kHomingSpeed = 15; // mm/sec  (make configurable ?)
 
+
   planner_->BringPathToHalt();
   if (hardware_mapping_->IsHardwareSimulated()) {
     // In that case, just issue a regular move to where we think home is.
@@ -742,6 +743,9 @@ void GCodeMachineControl::Impl::home_axis(enum GCodeParserAxis axis) {
   } else {
     move_to_endstop(axis, kHomingSpeed, true, trigger);
     planner_->SetExternalPosition(axis, home_pos);
+    AxesRegister current;
+    planner_->GetCurrentPosition(&current);
+    Log_debug("Axis %i homed to: %f\n", axis, current[axis]); // TODO: why does it refuse to go to say Y100 after homing to Y140?
   }
 }
 

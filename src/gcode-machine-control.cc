@@ -567,7 +567,7 @@ bool GCodeMachineControl::Impl::test_within_machine_limits(const AxesRegister &a
 
   for (const GCodeParserAxis i : AllAxes()) {
     // Min range ...
-    if (axes[i] < 0) {
+    if (axes[i] - coordinate_display_origin_[i] < 0) {
       // Machine cube must be in positive range.
       if (coordinate_display_origin_[i] != 0) {
         mprintf("// ERROR outside machine limit: Axis %c < min allowed "

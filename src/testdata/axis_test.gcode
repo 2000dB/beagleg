@@ -1,45 +1,9 @@
-#y=90
-#z=125
-G28
-G1 F5000
-M83
-
-M5
-
-G92 Y#y Z#z
-G1 Y0 Z0
-G92 X0 Y0 Z0
-
-(end setup, can now draw)
-
-(lower)
-M5
-M400
-M3 S100
-G1 X0  Y20 E50
-G1 X20 Y20 E50
-G1 X20 Y0  E50
-G1 X0  Y0  E50
-(raise)
-M3 S100
-M400
-M5
-
-G1 X0  Y40 E50
-(lower)
-M5
-M400
-M3 S100
-G1 X0  Y60 E50
-G1 X20 Y60 E50
-G1 X20 Y40 E50
-G1 X0  Y40 E50
-(raise)
-M3 S100
-M400
-M5
-
-G1 X40 E50
-
-G1 Y#y Z#z
-
+(setup)
+G28 (home axes)
+G1 F1000.00
+M83 (Relative E axis - in our case the paper feed return)
+G92 X64.0
+G1 X0.0 E64.0
+G1 E64.0
+G1 X64.0
+(/setup done, can now draw)
